@@ -1,0 +1,62 @@
+{
+  ".vscode/launch.json": {
+    "mtime": 1787808692.0,
+    "seen": 1787821030.0738125,
+    "ast_hash": "aa9948f0eed9799ba498fcff708c5bfa",
+    "semantic_hash": "aa9948f0eed9799ba498fcff708c5bfa"
+  },
+  ".vscode/settings.json": {
+    "mtime": 1787808692.0,
+    "seen": 1787821030.073818,
+    "ast_hash": "0fbfbe9c0b3a391e1d85052290c027c0",
+    "semantic_hash": "0fbfbe9c0b3a391e1d85052290c027c0"
+  },
+  "apps/test-ui/package.json": {
+    "mtime": 1787809746.0,
+    "seen": 1787821030.07382,
+    "ast_hash": "6f5006fc245e67b055a0c61ad611121a",
+    "semantic_hash": "6f5006fc245e67b055a0c61ad611121a"
+  },
+  "apps/test-ui/rsbuild.config.mts": {
+    "mtime": 1787808692.0,
+    "seen": 1787821030.0738218,
+    "ast_hash": "0d4ae8138d1bf97592d575b525e53e8d",
+    "semantic_hash": "0d4ae8138d1bf97592d575b525e53e8d"
+  },
+  "apps/test-ui/src/App.tsx": {
+    "mtime": 1787819852.0,
+    "seen": 1787821030.0738227,
+    "ast_hash": "2712f1bbd16504084ce101e5807ebafb",
+    "semantic_hash": "2712f1bbd16504084ce101e5807ebafb"
+  },
+  "apps/test-ui/src/AppDescriptor.ts": {
+    "mtime": 1787809748.0,
+    "seen": 1787821030.0738237,
+    "ast_hash": "6d1a53c62ff7fa2d175fc7130579a7a9",
+    "semantic_hash": "6d1a53c62ff7fa2d175fc7130579a7a9"
+  },
+  "apps/test-ui/src/global.d.ts": {
+    "mtime": 1787808692.0,
+    "seen": 1787821030.073825,
+    "ast_hash": "7c18c016fddac438bb0357e0fddf3060",
+    "semantic_hash": "7c18c016fddac438bb0357e0fddf3060"
+  },
+  "apps/test-ui/src/index.ts": {
+    "mtime": 1787808692.0,
+    "seen": 1787821030.0738256,
+    "ast_hash": "ff333727241ec498d6f73312fa31b628",
+    "semantic_hash": "ff333727241ec498d6f73312fa31b628"
+  },
+  "apps/test-ui/tsconfig.json": {
+    "mtime": 1787808692.0,
+    "seen": 1787821030.0738266,
+    "ast_hash": "e2b1b447092bbb84460024c5ee1c18b8",
+    "semantic_hash": "e2b1b447092bbb84460024c5ee1c18b8"
+  },
+  "batch_run.py": {
+    "mtime": 1787810474.0,
+    "seen": 1787821030.0738273,
+    "ast_hash": "4302cc0601b419196dcadbf7c5665dd3",
+    "semantic_hash": "4302cc0601b419196dcadbf7c5665dd3"
+  }
+}

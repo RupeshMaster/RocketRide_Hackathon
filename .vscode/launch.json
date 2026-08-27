@@ -1,0 +1,16 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Debug Test",
+      "type": "msedge",
+      "request": "launch",
+      "url": "http://localhost:50316/?appid=local.test&rrdev=1",
+      "webRoot": "${workspaceFolder}/apps/test-ui",
+      "sourceMapPathOverrides": {
+        "webpack:///./*": "${workspaceFolder}/apps/test-ui/*",
+        "webpack:///*": "*"
+      }
+    }
+  ]
+}
