@@ -1,14 +1,14 @@
 {
-  "name": "demoapp",
+  "name": "claimlens_ai-demoapp",
   "version": "0.1.0",
   "private": true,
-  "description": "Demoapp",
+  "description": "Demoapp — a RocketRide app",
   "license": "MIT",
   "appManifest": {
-    "id": "demoapp",
-    "publisher": "local",
+    "id": "claimlens_ai.demoapp",
+    "publisher": "claimlens_ai",
     "name": "Demoapp",
-    "description": "Demoapp MVP",
+    "description": "Demoapp — a RocketRide app",
     "icon": "./icon.svg",
     "readme": "./README.md",
     "categories": [
@@ -16,10 +16,7 @@
     ],
     "mode": "free",
     "authenticated": false,
-    "include": [
-      "pipeline"
-    ],
-    "projectId": "e4198dc1-1b6e-49bd-84af-f572d21598a5"
+    "projectId": "2ee4c402-852a-43bd-95cb-c412dde79af5"
   },
   "scripts": {
     "dev": "rsbuild dev",

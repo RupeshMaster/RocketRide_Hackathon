@@ -288,7 +288,7 @@ const Content: React.FC<ShellAppProps> = (props) => {
 				{/* HEADER */}
 				<div style={styles.header}>
 					<div style={styles.titleBlock}>
-						<h1 style={styles.title}>ClaimLens AI</h1>
+						<h1 style={styles.title}>Demoapp</h1>
 						<p style={styles.sub}>Enterprise AI Triage & Fraud Detection</p>
 					</div>
 					<div style={styles.statusBadge}>

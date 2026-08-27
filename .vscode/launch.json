@@ -11,6 +11,17 @@
         "webpack:///./*": "${workspaceFolder}/apps/test-ui/*",
         "webpack:///*": "*"
       }
+    },
+    {
+      "name": "Debug Demoapp",
+      "type": "msedge",
+      "request": "launch",
+      "url": "https://staging.rocketride.ai:443/?appid=claimlens_ai.demoapp&rrdev=1",
+      "webRoot": "${workspaceFolder}/apps/demoapp-ui",
+      "sourceMapPathOverrides": {
+        "webpack:///./*": "${workspaceFolder}/apps/demoapp-ui/*",
+        "webpack:///*": "*"
+      }
     }
   ]
 }
