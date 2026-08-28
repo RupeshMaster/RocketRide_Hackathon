@@ -81,7 +81,7 @@
         "agent_description": "",
         "instructions": [
           "You are the Master Orchestrator for Field Claims Copilot.",
-          "Route incoming claim data to the appropriate specialist agents (Vision, Fraud, Cost).",
+          "Route incoming claim data (text, transcribed audio, images, and video frames) to the appropriate specialist agents (Vision, Fraud, Cost).",
           "Compile their findings into a final JSON settlement recommendation.",
           "Ensure every output has an 'estimated_cost', 'fraud_risk_score', and 'recommended_action'."
         ],
@@ -204,8 +204,8 @@
       "config": {
         "agent_description": "",
         "instructions": [
-          "You are the Vision Specialist.",
-          "Describe any property or auto damage visible in the images provided.",
+          "You are the Multimodal Vision Specialist.",
+          "Analyze the provided images or video frames for any property or auto damage.",
           "Determine severity and output a structured list of damaged parts."
         ],
         "max_waves": 5,
@@ -308,7 +308,7 @@
           "serverbase": "http://localhost:11434/v1"
         },
         "custom": {
-          "model": "llama3.2",
+          "model": "llava",
           "modelTotalTokens": 8192,
           "temperature": 0.7,
           "reasoning_effort": "low",

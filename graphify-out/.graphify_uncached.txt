@@ -1,0 +1,8 @@
+D:\RocketRide\.claude\rules\rocketride.md
+D:\RocketRide\README.md
+D:\RocketRide\apps\demoapp-ui\README.md
+D:\RocketRide\apps\test-ui\README.md
+D:\RocketRide\pnpm-workspace.yaml
+D:\RocketRide\RocketRide Buildathon_ From Idea to Million Dollar App.pdf
+D:\RocketRide\apps\demoapp-ui\icon.svg
+D:\RocketRide\apps\test-ui\icon.svg

@@ -7,7 +7,7 @@
   "appManifest": {
     "id": "claimlens_ai.demoapp",
     "publisher": "claimlens_ai",
-    "name": "Demoapp",
+    "name": "ClaimLens AI",
     "description": "Demoapp — a RocketRide app",
     "icon": "./icon.svg",
     "readme": "./README.md",
@@ -16,6 +16,9 @@
     ],
     "mode": "free",
     "authenticated": false,
+    "include": [
+      "pipeline"
+    ],
     "projectId": "2ee4c402-852a-43bd-95cb-c412dde79af5"
   },
   "scripts": {
