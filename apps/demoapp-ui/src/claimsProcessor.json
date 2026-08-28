@@ -70,18 +70,6 @@
         {
           "lane": "text",
           "from": "parse_1"
-        },
-        {
-          "lane": "image",
-          "from": "parse_1"
-        },
-        {
-          "lane": "video",
-          "from": "parse_1"
-        },
-        {
-          "lane": "audio",
-          "from": "parse_1"
         }
       ]
     },
@@ -117,6 +105,18 @@
         {
           "lane": "questions",
           "from": "question_1"
+        },
+        {
+          "lane": "image",
+          "from": "parse_1"
+        },
+        {
+          "lane": "video",
+          "from": "parse_1"
+        },
+        {
+          "lane": "audio",
+          "from": "parse_1"
         }
       ]
     },
