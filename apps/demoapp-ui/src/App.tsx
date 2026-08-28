@@ -216,9 +216,11 @@ const styles: Record<string, React.CSSProperties> = {
 // =============================================================================
 
 const Content: React.FC<ShellAppProps> = (props) => {
-	// MANUAL OVERRIDE FOR DEMO
-	const isConnected = true;
-	const token = "demo-task-9981";
+	const { client, connectionState } = useShellConnection();
+	const isConnected = connectionState === 'connected';
+
+	const [pipelineSession, setPipelineSession] = useState<any>(null);
+
 	const [formData, setFormData] = useState({
 		claim_id: 'CLM-2026-99182',
 		policy_holder: 'Jane Doe',
@@ -231,14 +233,21 @@ const Content: React.FC<ShellAppProps> = (props) => {
 	const [error, setError] = useState<string | null>(null);
 	const [result, setResult] = useState<any>(null);
 	const [humanDecision, setHumanDecision] = useState<string | null>(null);
+	React.useEffect(() => {
+		if (client && isConnected && !pipelineSession) {
+			client.use({ pipeline: claimsProcessor as any })
+				.then(session => setPipelineSession(session))
+				.catch(err => console.error("Failed to init pipeline:", err));
+		}
+	}, [client, isConnected, pipelineSession]);
 
-	// 1. (Removed on-load initialization to prevent connection race conditions)
+	const token = pipelineSession?.token || null;
 
 	// 2. Submit Claim
 	const handleSubmit = async (e: React.FormEvent) => {
 		e.preventDefault();
-		if (!isConnected) {
-			setError('Cannot submit: System is offline (Local Engine not detected).');
+		if (!isConnected || !client || !pipelineSession) {
+			setError('Cannot submit: System is offline or pipeline not initialized.');
 			return;
 		}
 
@@ -253,24 +262,20 @@ const Content: React.FC<ShellAppProps> = (props) => {
 		};
 
 		try {
-			// Simulate AI Processing time for the demo video
-			await new Promise(r => setTimeout(r, 2500));
+			const res = await client.send(token, JSON.stringify(payload), 'application/json');
 			
-			const mockResponse = {
-				status: "success",
-				fraud_risk_score: 85,
-				recommended_action: "Investigate",
-				estimated_cost: 14500.00,
-				vision_analysis: [
-					"Severe structural damage to roof trusses.",
-					"Shingles stripped across 40% of surface area.",
-					"Impact zone consistent with large tree fall."
-				],
-				fraud_analysis: "High risk: Adjuster estimate (₹15,000) closely matches automated vision estimate (₹14,500), but metadata suggests photos were taken 3 days before the reported storm date.",
-				summary: "Claim requires manual SIU investigation due to timestamp discrepancies in the provided evidence."
-			};
-			
-			setResult(mockResponse);
+			if (res.outputs && res.outputs.length > 0) {
+				const aiOutput = res.outputs[0].value;
+				let parsedResult;
+				try {
+					parsedResult = typeof aiOutput === 'string' ? JSON.parse(aiOutput) : aiOutput;
+				} catch {
+					parsedResult = { summary: aiOutput };
+				}
+				setResult(parsedResult);
+			} else {
+				setResult({ summary: "No output received from AI." });
+			}
 		} catch (err) {
 			console.error("Pipeline failed:", err);
 			setError(err instanceof PipeException
