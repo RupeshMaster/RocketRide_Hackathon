@@ -1,0 +1,434 @@
+{
+  "components": [
+    {
+      "id": "webhook_1",
+      "provider": "webhook",
+      "name": "Webhook",
+      "config": {
+        "hideForm": true,
+        "mode": "Source",
+        "parameters": {},
+        "type": "webhook"
+      },
+      "ui": {
+        "position": {
+          "x": 10,
+          "y": 190
+        },
+        "measured": {
+          "width": 150,
+          "height": 214
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      }
+    },
+    {
+      "id": "parse_1",
+      "provider": "parse",
+      "name": "Parser",
+      "config": {},
+      "ui": {
+        "position": {
+          "x": 240,
+          "y": 200
+        },
+        "measured": {
+          "width": 150,
+          "height": 138
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "tags",
+          "from": "webhook_1"
+        }
+      ]
+    },
+    {
+      "id": "question_1",
+      "provider": "question",
+      "name": "Question",
+      "config": {
+        "type": "question"
+      },
+      "ui": {
+        "position": {
+          "x": 460,
+          "y": 200
+        },
+        "measured": {
+          "width": 150,
+          "height": 68
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "text",
+          "from": "parse_1"
+        },
+        {
+          "lane": "text",
+          "from": "parse_1"
+        },
+        {
+          "lane": "text",
+          "from": "parse_1"
+        },
+        {
+          "lane": "text",
+          "from": "parse_1"
+        }
+      ]
+    },
+    {
+      "id": "orchestrator",
+      "provider": "agent_rocketride",
+      "name": "RocketRide Wave",
+      "config": {
+        "agent_description": "",
+        "instructions": [
+          "You are the Master Orchestrator for Field Claims Copilot.",
+          "Route incoming claim data (text, transcribed audio, images, and video frames) to the appropriate specialist agents (Vision, Fraud, Cost).",
+          "Compile their findings into a final JSON settlement recommendation.",
+          "Ensure every output has an 'estimated_cost', 'fraud_risk_score', and 'recommended_action'."
+        ],
+        "max_waves": 10,
+        "require_tool_call": false,
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 680,
+          "y": 160
+        },
+        "measured": {
+          "width": 150,
+          "height": 106
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "questions",
+          "from": "question_1"
+        }
+      ]
+    },
+    {
+      "id": "response_1",
+      "provider": "response_answers",
+      "name": "Return Answers",
+      "config": {
+        "laneName": "answers"
+      },
+      "ui": {
+        "position": {
+          "x": 910,
+          "y": 200
+        },
+        "measured": {
+          "width": 150,
+          "height": 68
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "input": [
+        {
+          "lane": "answers",
+          "from": "orchestrator"
+        }
+      ]
+    },
+    {
+      "id": "llm_orchestrator",
+      "provider": "llm_ollama",
+      "name": "Ollama",
+      "config": {
+        "profile": "custom",
+        "llama3_3": {
+          "serverbase": "http://localhost:11434/v1"
+        },
+        "custom": {
+          "model": "llama3.2",
+          "modelTotalTokens": 8192,
+          "temperature": 0.7,
+          "reasoning_effort": "low",
+          "serverbase": "http://localhost:11434/v1"
+        },
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 460,
+          "y": 360
+        },
+        "measured": {
+          "width": 150,
+          "height": 68
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "control": [
+        {
+          "classType": "llm",
+          "from": "orchestrator"
+        }
+      ]
+    },
+    {
+      "id": "memory_1",
+      "provider": "memory_internal",
+      "name": "Memory (Internal)",
+      "config": {
+        "type": "memory_internal"
+      },
+      "ui": {
+        "position": {
+          "x": 680,
+          "y": 360
+        },
+        "measured": {
+          "width": 150,
+          "height": 54
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "control": [
+        {
+          "classType": "memory",
+          "from": "orchestrator"
+        }
+      ]
+    },
+    {
+      "id": "vision_agent",
+      "provider": "agent_rocketride",
+      "name": "RocketRide Wave",
+      "config": {
+        "agent_description": "",
+        "instructions": [
+          "You are the Multimodal Vision Specialist.",
+          "Analyze the provided images or video frames for any property or auto damage.",
+          "Determine severity and output a structured list of damaged parts."
+        ],
+        "max_waves": 5,
+        "require_tool_call": false,
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 910,
+          "y": 370
+        },
+        "measured": {
+          "width": 150,
+          "height": 106
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "control": [
+        {
+          "classType": "tool",
+          "from": "orchestrator"
+        }
+      ]
+    },
+    {
+      "id": "fraud_agent",
+      "provider": "agent_rocketride",
+      "name": "RocketRide Wave",
+      "config": {
+        "agent_description": "",
+        "instructions": [
+          "You are the Fraud Forensics Specialist.",
+          "Cross-reference damage with the story and look for inconsistencies.",
+          "Output a fraud risk score from 1-100 and a brief explanation."
+        ],
+        "max_waves": 5,
+        "require_tool_call": false,
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 1120,
+          "y": 360
+        },
+        "measured": {
+          "width": 150,
+          "height": 106
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "control": [
+        {
+          "classType": "tool",
+          "from": "orchestrator"
+        }
+      ]
+    },
+    {
+      "id": "cost_agent",
+      "provider": "agent_rocketride",
+      "name": "RocketRide Wave",
+      "config": {
+        "agent_description": "",
+        "instructions": [
+          "You are the Cost Estimation Specialist.",
+          "Calculate repair costs based on damaged parts using industry standard benchmarks."
+        ],
+        "max_waves": 5,
+        "require_tool_call": false,
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 1340,
+          "y": 360
+        },
+        "measured": {
+          "width": 150,
+          "height": 106
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "control": [
+        {
+          "classType": "tool",
+          "from": "orchestrator"
+        }
+      ]
+    },
+    {
+      "id": "llm_vision",
+      "provider": "llm_ollama",
+      "name": "Ollama",
+      "config": {
+        "profile": "custom",
+        "llama3_3": {
+          "serverbase": "http://localhost:11434/v1"
+        },
+        "custom": {
+          "model": "llava",
+          "modelTotalTokens": 8192,
+          "temperature": 0.7,
+          "reasoning_effort": "low",
+          "serverbase": "http://localhost:11434/v1"
+        },
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 900,
+          "y": 520
+        },
+        "measured": {
+          "width": 150,
+          "height": 68
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "control": [
+        {
+          "classType": "llm",
+          "from": "vision_agent"
+        }
+      ]
+    },
+    {
+      "id": "llm_fraud",
+      "provider": "llm_ollama",
+      "name": "Ollama",
+      "config": {
+        "profile": "custom",
+        "llama3_3": {
+          "serverbase": "http://localhost:11434/v1"
+        },
+        "custom": {
+          "model": "llama3.2",
+          "modelTotalTokens": 8192,
+          "temperature": 0.7,
+          "reasoning_effort": "low",
+          "serverbase": "http://localhost:11434/v1"
+        },
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 1120,
+          "y": 520
+        },
+        "measured": {
+          "width": 150,
+          "height": 68
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "control": [
+        {
+          "classType": "llm",
+          "from": "fraud_agent"
+        }
+      ]
+    },
+    {
+      "id": "llm_cost",
+      "provider": "llm_ollama",
+      "name": "Ollama",
+      "config": {
+        "profile": "custom",
+        "llama3_3": {
+          "serverbase": "http://localhost:11434/v1"
+        },
+        "custom": {
+          "model": "llama3.2",
+          "modelTotalTokens": 8192,
+          "temperature": 0.7,
+          "reasoning_effort": "low",
+          "serverbase": "http://localhost:11434/v1"
+        },
+        "parameters": {}
+      },
+      "ui": {
+        "position": {
+          "x": 1340,
+          "y": 520
+        },
+        "measured": {
+          "width": 150,
+          "height": 68
+        },
+        "nodeType": "default",
+        "formDataValid": true
+      },
+      "control": [
+        {
+          "classType": "llm",
+          "from": "cost_agent"
+        }
+      ]
+    }
+  ],
+  "project_id": "b8e19b33-4f9e-4a6c-9c92-7f2a1b5c4d3e",
+  "version": 1,
+  "isLocked": false,
+  "snapToGrid": true,
+  "snapGridSize": [
+    10,
+    10
+  ],
+  "docRevision": 6
+}
