@@ -5,7 +5,7 @@
 
 import React, { useState } from 'react';
 import type { ShellAppProps } from 'shell';
-import { AppLayout } from 'shell';
+import { AppLayout, useShellConnection } from 'shell';
 
 // Import assets
 import carImage from './assets/car.png';
@@ -223,12 +223,24 @@ const LandingPage = ({ onNavigate }: { onNavigate: (page: 'home' | 'assessment')
 // ASSESSMENT PAGE COMPONENT
 // =============================================================================
 
-const AssessmentPage = ({ onNavigate, runPipeline }: { onNavigate: (page: 'home' | 'assessment') => void, runPipeline?: (payload: any) => Promise<any> }) => {
+const AssessmentPage = ({ onNavigate }: { onNavigate: (page: 'home' | 'assessment') => void }) => {
+	const { client, isConnected } = useShellConnection();
+	const [pipelineSession, setPipelineSession] = useState<any>(null);
+
 	const [description, setDescription] = useState('');
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [aiResult, setAiResult] = useState<any>(null);
 	const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
 	const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+	// Initialize pipeline connection when client is ready
+	React.useEffect(() => {
+		if (client && isConnected && !pipelineSession) {
+			client.use({ pipeline: claimsProcessorPipeline as any, ttl: 900 })
+				.then((session: any) => setPipelineSession(session))
+				.catch((err: any) => console.error("Failed to init pipeline:", err));
+		}
+	}, [client, isConnected, pipelineSession]);
 
 	const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
 		if (e.target.files) {
@@ -238,6 +250,11 @@ const AssessmentPage = ({ onNavigate, runPipeline }: { onNavigate: (page: 'home'
 
 	const handleSubmit = async () => {
 		if (!description.trim()) return;
+		if (!isConnected || !client || !pipelineSession) {
+			alert("RocketRide engine is not connected or pipeline not initialized.");
+			return;
+		}
+
 		setIsProcessing(true);
 		
 		try {
@@ -249,19 +266,9 @@ const AssessmentPage = ({ onNavigate, runPipeline }: { onNavigate: (page: 'home'
 				repair_estimate_provided: 0
 			};
 
-			if (runPipeline) {
-				const response = await runPipeline(payload);
-				setAiResult(response);
-			} else {
-				// Fallback if runPipeline is not provided by the shell (e.g. running standalone)
-				const client = new RocketRideClient({ uri: 'http://localhost:3545/engine', auth: 'local' });
-				await client.connect();
-				const { token } = await client.use({ pipeline: claimsProcessorPipeline as any, ttl: 900 });
-				const responseStr = await client.send(token, JSON.stringify(payload), undefined, 'application/json');
-				const response = typeof responseStr === 'string' ? JSON.parse(responseStr) : responseStr;
-				setAiResult(response);
-				await client.disconnect();
-			}
+			const responseStr = await client.send(pipelineSession.token, JSON.stringify(payload), undefined, 'application/json');
+			const response = typeof responseStr === 'string' ? JSON.parse(responseStr) : responseStr;
+			setAiResult(response);
 		} catch (error) {
 			console.error("Pipeline error:", error);
 			alert("Error connecting to RocketRide pipeline.");
@@ -592,7 +599,7 @@ const App: React.FC<ShellAppProps> = (props) => {
 			{currentPage === 'home' ? (
 				<LandingPage onNavigate={setCurrentPage} />
 			) : (
-				<AssessmentPage onNavigate={setCurrentPage} runPipeline={(props as any).runPipeline} />
+				<AssessmentPage onNavigate={setCurrentPage} />
 			)}
 		</AppLayout>
 	);
