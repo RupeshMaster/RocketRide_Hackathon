@@ -64,7 +64,7 @@ export default defineConfig(() => ({
 	// CORS: explicitly allow any origin — the serving host isn't fixed, so no
 	// allowlist is possible; declaring it also stops the MF plugin injecting
 	// its own wildcard defaults (and warning about it).
-	server: { port: 3544, cors: { origin: '*' } },
+	server: { port: 3546, cors: { origin: '*' } },
 	// hmr on; liveReload stays at its DEFAULT (true): a failed hot update
 	// that rejects check() falls back to a full reload of the preview page.
 	// (The historic reload loop came from zombie multi-container HMR clients,

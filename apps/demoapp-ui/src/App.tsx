@@ -223,21 +223,24 @@ const LandingPage = ({ onNavigate }: { onNavigate: (page: 'home' | 'assessment')
 // ASSESSMENT PAGE COMPONENT
 // =============================================================================
 
-const AssessmentPage = ({ onNavigate }: { onNavigate: (page: 'home' | 'assessment') => void }) => {
+const AssessmentPage = ({ onNavigate, runPipeline }: { onNavigate: (page: 'home' | 'assessment') => void, runPipeline?: (payload: any) => Promise<any> }) => {
 	const [description, setDescription] = useState('');
 	const [isProcessing, setIsProcessing] = useState(false);
 	const [aiResult, setAiResult] = useState<any>(null);
+	const [uploadedFiles, setUploadedFiles] = useState<File[]>([]);
+	const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+	const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+		if (e.target.files) {
+			setUploadedFiles(prev => [...prev, ...Array.from(e.target.files!)]);
+		}
+	};
 
 	const handleSubmit = async () => {
 		if (!description.trim()) return;
 		setIsProcessing(true);
 		
 		try {
-			const client = new RocketRideClient({ uri: 'http://localhost:3545/engine', auth: 'local' });
-			await client.connect();
-
-			const { token } = await client.use({ pipeline: claimsProcessorPipeline as any, ttl: 900 });
-
 			const payload = {
 				claim_id: 'VHC-8829',
 				policy_holder: 'Test User',
@@ -246,11 +249,19 @@ const AssessmentPage = ({ onNavigate }: { onNavigate: (page: 'home' | 'assessmen
 				repair_estimate_provided: 0
 			};
 
-			const responseStr = await client.send(token, JSON.stringify(payload), undefined, 'application/json');
-			const response = typeof responseStr === 'string' ? JSON.parse(responseStr) : responseStr;
-			
-			setAiResult(response);
-			await client.disconnect();
+			if (runPipeline) {
+				const response = await runPipeline(payload);
+				setAiResult(response);
+			} else {
+				// Fallback if runPipeline is not provided by the shell (e.g. running standalone)
+				const client = new RocketRideClient({ uri: 'http://localhost:3545/engine', auth: 'local' });
+				await client.connect();
+				const { token } = await client.use({ pipeline: claimsProcessorPipeline as any, ttl: 900 });
+				const responseStr = await client.send(token, JSON.stringify(payload), undefined, 'application/json');
+				const response = typeof responseStr === 'string' ? JSON.parse(responseStr) : responseStr;
+				setAiResult(response);
+				await client.disconnect();
+			}
 		} catch (error) {
 			console.error("Pipeline error:", error);
 			alert("Error connecting to RocketRide pipeline.");
@@ -351,22 +362,43 @@ const AssessmentPage = ({ onNavigate }: { onNavigate: (page: 'home' | 'assessmen
 											📷
 										</div>
 									</div>
-									<button style={{ ...styles.primaryBtn, margin: '0 auto 12px' }}>Add Photos & Videos</button>
+									<input 
+										type="file" 
+										multiple 
+										accept="image/*,video/*" 
+										style={{ display: 'none' }} 
+										ref={fileInputRef}
+										onChange={handleFileSelect}
+									/>
+									<button 
+										style={{ ...styles.primaryBtn, margin: '0 auto 12px' }}
+										onClick={() => fileInputRef.current?.click()}
+									>
+										Add Photos & Videos
+									</button>
 									<div style={{ fontSize: '12px', color: '#94a3b8' }}>Please upload 5-15 photos/videos of the damage.</div>
 								</div>
 
 								<div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
-									<span style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>Uploaded Files (5)</span>
-									<span style={{ fontSize: '12px', fontWeight: 600, color: '#ef4444' }}>⚠️ Minimum 5 files required to proceed</span>
+									<span style={{ fontSize: '13px', fontWeight: 700, color: '#0f172a' }}>Uploaded Files ({uploadedFiles.length})</span>
+									{uploadedFiles.length < 5 && (
+										<span style={{ fontSize: '12px', fontWeight: 600, color: '#ef4444' }}>⚠️ Minimum 5 files required to proceed</span>
+									)}
 								</div>
-								<div style={{ display: 'flex', gap: '12px' }}>
-									<div style={{ width: '80px', height: '80px', backgroundColor: '#eff6ff', border: '2px solid #bfdbfe', borderRadius: '8px', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', color: '#2563eb' }}>
-										<div style={{ width: '20px', height: '20px', border: '2px solid #bfdbfe', borderTopColor: '#2563eb', borderRadius: '50%', marginBottom: '8px' }}></div>
-										<span style={{ fontSize: '11px', fontWeight: 600 }}>Loading...</span>
-									</div>
-									{[1,2,3,4].map(i => (
-										<div key={i} style={{ width: '80px', height: '80px', backgroundColor: '#f1f5f9', borderRadius: '8px', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#cbd5e1' }}>
-											🖼️
+								<div style={{ display: 'flex', gap: '12px', flexWrap: 'wrap' }}>
+									{uploadedFiles.map((file, i) => (
+										<div key={i} style={{ position: 'relative', width: '80px', height: '80px', backgroundColor: '#f1f5f9', borderRadius: '8px', overflow: 'hidden' }}>
+											{file.type.startsWith('image/') ? (
+												<img src={URL.createObjectURL(file)} alt="preview" style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+											) : (
+												<div style={{ width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center', color: '#94a3b8', fontSize: '24px' }}>🎥</div>
+											)}
+											<div 
+												onClick={() => setUploadedFiles(prev => prev.filter((_, idx) => idx !== i))}
+												style={{ position: 'absolute', top: '4px', right: '4px', width: '20px', height: '20px', backgroundColor: 'rgba(0,0,0,0.5)', color: 'white', borderRadius: '50%', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '10px', cursor: 'pointer' }}
+											>
+												✕
+											</div>
 										</div>
 									))}
 								</div>
@@ -560,7 +592,7 @@ const App: React.FC<ShellAppProps> = (props) => {
 			{currentPage === 'home' ? (
 				<LandingPage onNavigate={setCurrentPage} />
 			) : (
-				<AssessmentPage onNavigate={setCurrentPage} />
+				<AssessmentPage onNavigate={setCurrentPage} runPipeline={(props as any).runPipeline} />
 			)}
 		</AppLayout>
 	);
