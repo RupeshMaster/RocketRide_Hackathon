@@ -5,9 +5,9 @@
   "description": "Demoapp",
   "license": "MIT",
   "appManifest": {
-    "id": "demoapp",
+    "id": "local.test",
     "publisher": "local",
-    "name": "Demoapp",
+    "name": "ClaimLens AI",
     "description": "Demoapp MVP",
     "icon": "./icon.svg",
     "readme": "./README.md",

@@ -10,3 +10,4 @@ declare module '*.pipe' {
 	const value: Record<string, unknown>;
 	export default value;
 }
+declare module '*.png';

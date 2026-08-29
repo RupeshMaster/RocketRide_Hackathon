@@ -216,8 +216,7 @@ const styles: Record<string, React.CSSProperties> = {
 // =============================================================================
 
 const Content: React.FC<ShellAppProps> = (props) => {
-	const { client, connectionState } = useShellConnection();
-	const isConnected = connectionState === 'connected';
+	const { client, isConnected, statusMessage } = useShellConnection();
 
 	const [pipelineSession, setPipelineSession] = useState<any>(null);
 
@@ -264,9 +263,9 @@ const Content: React.FC<ShellAppProps> = (props) => {
 		};
 
 		try {
-			const res = await client.send(token, JSON.stringify(payload), 'application/json');
+			const res = await client.send(token, JSON.stringify(payload), {}, 'application/json');
 			
-			if (res.outputs && res.outputs.length > 0) {
+			if (res && res.outputs && res.outputs.length > 0) {
 				const aiOutput = res.outputs[0].value;
 				let parsedResult;
 				try {
@@ -295,7 +294,7 @@ const Content: React.FC<ShellAppProps> = (props) => {
 				{/* HEADER */}
 				<div style={styles.header}>
 					<div style={styles.titleBlock}>
-						<h1 style={styles.title}>Demoapp</h1>
+						<h1 style={styles.title}>ClaimLens AI</h1>
 						<p style={styles.sub}>Enterprise AI Triage & Fraud Detection</p>
 					</div>
 					<div style={styles.statusBadge}>
@@ -304,7 +303,7 @@ const Content: React.FC<ShellAppProps> = (props) => {
 							backgroundColor: isConnected ? '#10b981' : '#ef4444',
 							boxShadow: isConnected ? '0 0 10px #10b981' : '0 0 10px #ef4444'
 						}} />
-						{isConnected ? 'System Online (Local Engine)' : 'System Offline'}
+						{isConnected ? 'System Online (Local Engine)' : `System Offline - ${statusMessage || 'Unknown error'}`}
 						{token && <span style={{ color: '#64748b', marginLeft: '8px', fontSize: '11px' }}>Task: {token.substring(0, 8)}...</span>}
 					</div>
 				</div>
